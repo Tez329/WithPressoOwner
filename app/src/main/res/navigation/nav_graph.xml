@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/signUpFragment">
+
+    <fragment
+        android:id="@+id/basicInfoFragment"
+        android:name="com.example.withpressoowner.fragment.BasicInfoFragment"
+        android:label="BasicInfoFragment"
+        tools:layout="@layout/fragment_basic_info">
+        <action
+            android:id="@+id/action_basicInfoFragment_to_detailInfoFragment"
+            app:destination="@id/detailInfoFragment" >
+            <argument
+                android:name="cafe_name"
+                android:defaultValue="empty" />
+            <argument
+                android:name="cafe_addr"
+                android:defaultValue="empty" />
+            <argument
+                android:name="cafe_hour"
+                android:defaultValue="empty" />
+            <argument
+                android:name="cafe_tel"
+                android:defaultValue="empty" />
+            <argument
+                android:name="cafe_menu"
+                android:defaultValue="empty" />
+        </action>
+        <action
+            android:id="@+id/action_basicInfoFragment_to_signUpFragment"
+            app:destination="@id/signUpFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/detailInfoFragment"
+        android:name="com.example.withpressoowner.fragment.DetailInfoFragment"
+        android:label="DetailInfoFragment"
+        tools:layout="@layout/fragment_detail_info">
+        <action
+            android:id="@+id/action_detailInfoFragment_to_detailInfoSecFragment"
+            app:destination="@id/detailInfoSecFragment" >
+            <argument
+                android:name="chair_back"
+                android:defaultValue="false" />
+            <argument
+                android:name="cafe_name"
+                android:defaultValue="empty" />
+            <argument
+                android:name="cafe_addr"
+                android:defaultValue="empty" />
+            <argument
+                android:name="cafe_hour"
+                android:defaultValue="empty" />
+            <argument
+                android:name="cafe_tel"
+                android:defaultValue="empty" />
+            <argument
+                android:name="cafe_menu"
+                android:defaultValue="empty" />
+            <argument
+                android:name="chair_cushion_info"
+                android:defaultValue="empty" />
+            <argument
+                android:name="bgm_info"
+                android:defaultValue="empty" />
+            <argument
+                android:name="table_info_seat1"
+                android:defaultValue="-1" />
+            <argument
+                android:name="table_info_seat2"
+                android:defaultValue="-1" />
+            <argument
+                android:name="table_info_seat4"
+                android:defaultValue="-1" />
+            <argument
+                android:name="table_info_multi_seat"
+                android:defaultValue="-1" />
+            <argument
+                android:name="table_size_info"
+                android:defaultValue="-1" />
+            <argument
+                android:name="num_plug"
+                android:defaultValue="-1" />
+        </action>
+        <action
+            android:id="@+id/action_detailInfoFragment_to_basicInfoFragment"
+            app:destination="@id/basicInfoFragment" />
+        <argument
+            android:name="cafe_name"
+            app:argType="string" />
+        <argument
+            android:name="cafe_addr"
+            app:argType="string" />
+        <argument android:name="cafe_hour"
+            app:argType="string" />
+        <argument
+            android:name="cafe_tel"
+            app:argType="string" />
+        <argument
+            android:name="cafe_menu"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/detailInfoSecFragment"
+        android:name="com.example.withpressoowner.fragment.DetailInfoSecFragment"
+        android:label="DetailInfoSecFragment"
+        tools:layout="@layout/fragment_detail_info_sec">
+        <action
+            android:id="@+id/action_detailInfoSecFragment_to_detailInfoFragment"
+            app:destination="@id/detailInfoFragment" />
+        <argument
+            android:name="chair_back"
+            app:argType="boolean" />
+        <argument
+            android:name="cafe_name"
+            app:argType="string" />
+        <argument
+            android:name="cafe_addr"
+            app:argType="string" />
+        <argument
+            android:name="cafe_hour"
+            app:argType="string" />
+        <argument android:name="cafe_tel"
+            app:argType="string" />
+        <argument
+            android:name="cafe_menu"
+            app:argType="string" />
+        <argument
+            android:name="table_info_seat1"
+            app:argType="integer" />
+        <argument
+            android:name="table_info_seat2"
+            app:argType="integer" />
+        <argument
+            android:name="table_info_seat4"
+            app:argType="integer" />
+        <argument
+            android:name="table_info_multi_seat"
+            app:argType="integer" />
+        <argument
+            android:name="table_size_info"
+            app:argType="integer" />
+        <argument
+            android:name="chair_cushion_info"
+            app:argType="string" />
+        <argument
+            android:name="num_plug"
+            app:argType="integer" />
+        <argument
+            android:name="bgm_info"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/signUpFragment"
+        android:name="com.example.withpressoowner.fragment.SignUpFragment"
+        android:label="SignUpFragment"
+        tools:layout="@layout/fragment_sign_up">
+        <action
+            android:id="@+id/action_signUpFragment_to_basicInfoFragment"
+            app:destination="@id/basicInfoFragment" />
+    </fragment>
+</navigation>
