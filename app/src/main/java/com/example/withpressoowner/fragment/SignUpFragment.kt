@@ -11,11 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
-import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.example.withpressoowner.R
@@ -137,7 +133,7 @@ class SignUpFragment : Fragment() {
                                 toast("사용 가능한 아이디입니다")
                             }
                             else
-                                alert(title = "중복 확인 실패", message = "이미 사용 중인 아이디입니다")
+                                toast("이미 사용 중인 아이디입니다")
                         }
                     }
                     /* 통신이 실패하면 출력 */
@@ -182,20 +178,24 @@ class SignUpFragment : Fragment() {
                 val busi_num = sign_up_busi_num_edit.text.toString()
                 val signUpService = retrofit.create(SignUpService::class.java)
                 scope.launch {
-                    val signUpResult = signUpService.requestSignUp(owner_id, owner_pw, owner_name, busi_num)
-                    signUpResult?.let {
-                        if (signUpResult == 1) {
-                            findNavController().navigate(R.id.action_signUpFragment_to_basicInfoFragment)
-                            toast("회원 가입 성공")
+                    val result = signUpService.requestSignUp(owner_id, owner_pw, owner_name, busi_num)
+                    result?.let {
+                        if (result.owner_asin != 0) {
+                            val edit = pref.edit()
+                            edit.putString("id", owner_id)
+                            edit.putString("pw", owner_pw)
+                            edit.putString("owner_name", owner_name)
+                            edit.putInt("owner_asin", result.owner_asin)
+                            edit.apply()
+
+                            findNavController().navigate(R.id.action_signUpFragment_to_logInFragment)
                         }
-                        else
-                            toast("회원 가입 실패")
                     }
                 }
             }
         }
         sign_up_prev_image.setOnClickListener {
-            requireActivity().onBackPressed()
+            findNavController().popBackStack()
         }
     }
 

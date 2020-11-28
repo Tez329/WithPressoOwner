@@ -43,26 +43,28 @@
                 android:layout_marginTop="40dp"
                 android:text="@string/restroom_loc_and_gender" />
 
-            <RadioGroup
-                android:id="@+id/detail_info2_rest_loc_group"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/detail_info2_restroom_layout1"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="10dp"
-                android:layout_marginEnd="20dp">
+                android:layout_marginEnd="20dp"
+                android:orientation="horizontal">
 
-                <LinearLayout
-                    android:id="@+id/detail_info2_restroom_layout1"
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/detail_info2_rest_inout_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/restroom_loc" />
+
+                <RadioGroup
+                    android:id="@+id/detail_info2_rest_loc_group"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
-                    <TextView
-                        android:id="@+id/detail_info2_rest_inout_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:text="@string/restroom_loc" />
                     <!-- 있어요 -->
                     <RadioButton
                         android:id="@+id/detail_info2_rest_in_radio"
@@ -78,29 +80,30 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="20dp"
                         android:text="@string/restroom_out"/>
-                </LinearLayout>
-            </RadioGroup>
+                </RadioGroup>
+            </LinearLayout>
 
-            <RadioGroup
-                android:id="@+id/detail_info2_rest_gen_sep_group"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/detail_info2_restroom_layout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="10dp"
-                android:layout_marginEnd="20dp">
+                android:layout_marginEnd="20dp"
+                android:orientation="horizontal">
 
-                <LinearLayout
-                    android:id="@+id/detail_info2_restroom_layout"
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/detail_info2_rest_gen_sep_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/gender_sep" />
+
+                <RadioGroup
+                    android:id="@+id/detail_info2_rest_gen_sep_group"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/detail_info2_rest_gen_sep_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:text="@string/gender_sep" />
 
                     <!-- 있어요 -->
                     <RadioButton
@@ -117,8 +120,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="20dp"
                         android:text="@string/gen_sep_no"/>
-                </LinearLayout>
-            </RadioGroup>
+                </RadioGroup>
+            </LinearLayout>
 
 
             <!-- 흡연실 -->
@@ -130,26 +133,28 @@
                 android:layout_marginTop="40dp"
                 android:text="흡연실 유무를 알려주세요" />
 
-            <RadioGroup
-                android:id="@+id/detail_info2_smoking_room_group"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/detail_info2_smoking_room_layout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="10dp"
-                android:layout_marginEnd="20dp">
+                android:layout_marginEnd="20dp"
+                android:orientation="horizontal">
 
-                <LinearLayout
-                    android:id="@+id/detail_info2_smoking_room_layout"
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/detail_info2_smoking_room_inout_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/smoking_room_loc" />
+
+                <RadioGroup
+                    android:id="@+id/detail_info2_smoking_room_group"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
-                    <TextView
-                        android:id="@+id/detail_info2_smoking_room_inout_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:text="@string/smoking_room_loc" />
                     <!-- 있어요 -->
                     <RadioButton
                         android:id="@+id/detail_info2_smoking_room_in_radio"
@@ -165,8 +170,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="20dp"
                         android:text="@string/smoking_room_out" />
-                </LinearLayout>
-            </RadioGroup>
+                </RadioGroup>
+            </LinearLayout>
 
             <!-- 최근 방역 날짜  -->
             <TextView

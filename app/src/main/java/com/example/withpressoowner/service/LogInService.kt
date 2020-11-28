@@ -9,14 +9,15 @@ import java.io.Serializable
 
 data class Login (
     @SerializedName("cafe_asin") var cafe_asin: Int,
+    @SerializedName("owner_asin") var owner_asin: Int,
     @SerializedName("owner_name") var owner_name: String
 ): Serializable
 
 interface LogInService {
     @FormUrlEncoded
-    @POST("/log_in/")
+    @POST("/owner/login/")
     fun requestLogin(
-        @Field("user_id")id: String,
-        @Field("user_pw")pw: String
+        @Field("owner_id")id: String,
+        @Field("owner_pw")pw: String
     ): Call<Login>
 }

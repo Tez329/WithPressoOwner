@@ -1,14 +1,15 @@
 package com.example.withpressoowner.service
 
+
 import retrofit2.Call
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
 
-interface IdDupConfirmService{
+interface SendAuthCodeService {
     @FormUrlEncoded
-    @POST("/owner/id_dup_check_service/")
-    fun requestIdDupConfirm(
-        @Field("owner_id") owner_id:String
-    ):Call<String>
+    @POST("/owner/phone_num/")
+    fun requestSendMsg(
+        @Field("phone_num") phone_num: String
+    ): Call<Int>
 }

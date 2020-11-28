@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/signUpFragment">
+    app:startDestination="@id/logInFragment">
 
     <fragment
         android:id="@+id/basicInfoFragment"
@@ -13,7 +13,7 @@
         tools:layout="@layout/fragment_basic_info">
         <action
             android:id="@+id/action_basicInfoFragment_to_detailInfoFragment"
-            app:destination="@id/detailInfoFragment" >
+            app:destination="@id/detailInfoFragment">
             <argument
                 android:name="cafe_name"
                 android:defaultValue="empty" />
@@ -31,8 +31,23 @@
                 android:defaultValue="empty" />
         </action>
         <action
-            android:id="@+id/action_basicInfoFragment_to_signUpFragment"
-            app:destination="@id/signUpFragment" />
+            android:id="@+id/action_basicInfoFragment_to_logInFragment"
+            app:destination="@id/logInFragment" />
+        <action
+            android:id="@+id/action_basicInfoFragment_to_addressSearchFragment"
+            app:destination="@id/addressSearchFragment" />
+        <argument
+            android:name="roadAddr"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="coord_x"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="coord_y"
+            app:argType="string"
+            app:nullable="true" />
     </fragment>
     <fragment
         android:id="@+id/detailInfoFragment"
@@ -41,7 +56,7 @@
         tools:layout="@layout/fragment_detail_info">
         <action
             android:id="@+id/action_detailInfoFragment_to_detailInfoSecFragment"
-            app:destination="@id/detailInfoSecFragment" >
+            app:destination="@id/detailInfoSecFragment">
             <argument
                 android:name="chair_back"
                 android:defaultValue="false" />
@@ -102,6 +117,12 @@
         <argument
             android:name="cafe_menu"
             app:argType="string" />
+        <argument
+            android:name="coord_x"
+            app:argType="string" />
+        <argument
+            android:name="coord_y"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/detailInfoSecFragment"
@@ -112,8 +133,8 @@
             android:id="@+id/action_detailInfoSecFragment_to_detailInfoFragment"
             app:destination="@id/detailInfoFragment" />
         <argument
-            android:name="chair_back"
-            app:argType="boolean" />
+            android:name="chair_back_info"
+            app:argType="integer" />
         <argument
             android:name="cafe_name"
             app:argType="string" />
@@ -152,6 +173,15 @@
         <argument
             android:name="bgm_info"
             app:argType="string" />
+        <action
+            android:id="@+id/action_detailInfoSecFragment_to_cafeManageFragment"
+            app:destination="@id/cafeManageFragment" />
+        <argument
+            android:name="coord_x"
+            app:argType="string" />
+        <argument
+            android:name="coord_y"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/signUpFragment"
@@ -160,6 +190,42 @@
         tools:layout="@layout/fragment_sign_up">
         <action
             android:id="@+id/action_signUpFragment_to_basicInfoFragment"
+            app:destination="@id/basicInfoFragment" />
+        <action
+            android:id="@+id/action_signUpFragment_to_logInFragment"
+            app:destination="@id/logInFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/logInFragment"
+        android:name="com.example.withpressoowner.fragment.LogInFragment"
+        android:label="fragment_log_in"
+        tools:layout="@layout/fragment_log_in" >
+        <action
+            android:id="@+id/action_logInFragment_to_signUpFragment"
+            app:destination="@id/signUpFragment" />
+        <action
+            android:id="@+id/action_logInFragment_to_basicInfoFragment"
+            app:destination="@id/basicInfoFragment" />
+        <action
+            android:id="@+id/action_logInFragment_to_cafeManageFragment"
+            app:destination="@id/cafeManageFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/cafeManageFragment"
+        android:name="com.example.withpressoowner.fragment.CafeManageFragment"
+        android:label="fragment_cafe_manage"
+        tools:layout="@layout/fragment_cafe_manage" >
+        <action
+            android:id="@+id/action_cafeManageFragment_to_logInFragment"
+            app:destination="@id/logInFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/addressSearchFragment"
+        android:name="com.example.withpressoowner.fragment.AddressSearchFragment"
+        android:label="AddressSearchFragment"
+        tools:layout="@layout/fragment_address_search">
+        <action
+            android:id="@+id/action_addressSearchFragment_to_basicInfoFragment"
             app:destination="@id/basicInfoFragment" />
     </fragment>
 </navigation>

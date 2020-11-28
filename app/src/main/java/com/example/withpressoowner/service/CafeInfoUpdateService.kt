@@ -1,26 +1,18 @@
 package com.example.withpressoowner.service
 
-import com.google.gson.annotations.SerializedName
-import retrofit2.Call
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
-import java.io.Serializable
 
-data class CafeAsin (
-    @SerializedName("cafe_asin") val cafe_asin: Int
-): Serializable
 
-interface CafeInfoRegisterService {
+interface CafeInfoUpdateService {
     @FormUrlEncoded
-    @POST("/owner/cafe_info_register/")
-    fun requestCafeInfoRegister(
-        @Field("owner_asin") owner_asin: Int,
+    @POST("/owner/update_cafe_info/")
+    suspend fun requestCafeInfoUpdate(
+        @Field("cafe_asin") cafe_asin: Int,
         /* 카페 기본 정보 */
         @Field("cafe_name") cafe_name: String,
         @Field("cafe_addr") cafe_addr: String,
-        @Field("coor_x") coord_x: String,
-        @Field("coor_y") coord_y: String,
         @Field("cafe_hour") cafe_hour: String,
         @Field("cafe_tel") cafe_tel: String,
         @Field("cafe_menu") cafe_menu: String,
@@ -44,5 +36,5 @@ interface CafeInfoRegisterService {
         @Field("smoking_room") smoking_room: Int,
         /* 11.할인율 */
         @Field("discount") discount: Int
-        ): Call<CafeAsin>
+    ): Int
 }

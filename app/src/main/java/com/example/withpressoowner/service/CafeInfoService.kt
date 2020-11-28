@@ -3,6 +3,7 @@ package com.example.withpressoowner.service
 import com.google.gson.annotations.SerializedName
 import retrofit2.http.GET
 import retrofit2.http.Path
+import retrofit2.http.Query
 import java.io.Serializable
 
 data class CafeInfo (
@@ -12,9 +13,11 @@ data class CafeInfo (
     @SerializedName("cafe_hour") var cafe_hour: String,
     @SerializedName("cafe_tel") var cafe_tel:String,
     @SerializedName("cafe_menu") var cafe_menu:String,
+    /* photo */
+    @SerializedName("num_of_pics") var num_of_pics: Int,
     /* table*/
     @SerializedName("table_info") var table_struct: String,
-    @SerializedName("table_size_info") var table_size: String,
+    @SerializedName("table_size_info") var table_size: Int,
     /* chair */
     @SerializedName("chair_back_info") var chair_back: Int,
     @SerializedName("chair_cushion_info") var chair_cushion: String,
@@ -29,6 +32,8 @@ data class CafeInfo (
     @SerializedName("sterilization_info") var anco_data: String,
     /*smoking room*/
     @SerializedName("smoking_room") var smoking_room: Int,
+    /*discount*/
+    @SerializedName("discount") var discount: Int,
     /* user review */
     @SerializedName("user_clean_info") var cafe_clean: Float,
     @SerializedName("user_toilet_clean_info") var rest_clean: Float,
@@ -37,8 +42,8 @@ data class CafeInfo (
 ): Serializable
 
 interface CafeInfoService {
-    @GET("/${"cafe_asin"}/cafe_info/")
+    @GET("/owner/owners_cafe_infomation")
     suspend fun requestCafeInfo(
-        @Path("cafe_asin") cafe_asin: Int
+        @Query("cafe_asin") cafe_asin: Int
     ): CafeInfo
 }

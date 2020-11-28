@@ -48,13 +48,35 @@
                 android:layout_marginTop="30dp"
                 android:text="@string/cafe_addr" />
 
-            <EditText
-                android:id="@+id/basic_info_cafe_addr_edit"
-                style="@style/sign_up_edit"
-                android:hint="@string/cafe_addr_verbose"
-                android:inputType="text" />
-
             <!-- 운영 시간 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:orientation="horizontal"
+                android:weightSum="10">
+
+                <EditText
+                    android:id="@+id/basic_info_cafe_addr_edit"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="7.5"
+                    android:enabled="false"
+                    android:hint="@string/cafe_addr_verbose"
+                    android:inputType="text" />
+
+                <Button
+                    android:id="@+id/basic_info_cafe_addr_button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:layout_weight="2.5"
+                    android:background="@drawable/log_in_button"
+                    android:text="@string/search" />
+
+            </LinearLayout>
+
             <TextView
                 android:id="@+id/basic_info_hour_text"
                 style="@style/sign_up_text"
@@ -82,19 +104,20 @@
             <TextView
                 android:id="@+id/basic_info_menu_text"
                 style="@style/sign_up_text"
-                android:text="@string/menu" />
+                android:text="@string/menu"
+                android:textSize="20sp"/>
 
             <EditText
                 android:id="@+id/basic_info_menu_edit"
                 style="@style/sign_up_edit"
                 android:layout_height="wrap_content"
-                android:hint="@string/menu_verbose"
                 android:gravity="top"
+                android:hint="@string/menu_verbose"
                 android:inputType="textMultiLine"
                 android:lines="6"
-                android:minLines="6"
                 android:maxLines="8"
-                android:scrollbars="vertical"/>
+                android:minLines="6"
+                android:scrollbars="vertical" />
 
             <LinearLayout
                 android:layout_width="match_parent"

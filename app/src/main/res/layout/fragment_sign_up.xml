@@ -100,7 +100,7 @@
                 android:id="@+id/sign_up_owner_name_edit"
                 style="@style/sign_up_edit"
                 android:hint="@string/owner_name_verbose"
-                android:inputType="number" />
+                android:inputType="text" />
 
             <!-- business number -->
             <TextView

@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">WithPressoOwner</string>
-    <string name="title">WithPresso</string>
+    <string name="title">WithPresso For Owner</string>
     <string name="id">아이디</string>
     <string name="password">비밀번호</string>
     <string name="log_in">로그인</string>
@@ -58,4 +58,11 @@
     <string name="restroom_out">카페 외부에 있어요</string>
     <string name="gen_sep_yes">분리돼 있어요</string>
     <string name="gen_sep_no">합쳐져 있어요</string>
+    <string name="cafe_info_manage">카페 정보 관리</string>
+    <string name="modify">정보 수정</string>
+    <string name="change_reflect">변경 내용 저장</string>
+    <string name="search">검색하기</string>
+    <string name="add_photo">카페 사진 추가</string>
+    <string name="menu_name">메뉴 이름</string>
+    <string name="send_check_msg">손님 인증 메시지 보내기</string>
 </resources>
