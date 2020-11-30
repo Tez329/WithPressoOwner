@@ -359,58 +359,63 @@
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp">
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp">
 
-
-                    <!-- 카페 정보 수정 버튼 & 로그아웃 버튼 -->
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/cafe_manage_button_layout"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginBottom="10dp"
-                        android:orientation="horizontal">
+                    <TableRow
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="8dp"
+                        android:background="@drawable/table_row_layout"
+                        android:divider="@android:color/darker_gray"
+                        android:dividerPadding="2dp"
+                        android:showDividers="middle|beginning">
 
                         <Button
                             android:id="@+id/cafe_manage_whole_detail_button"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="10dp"
-                            android:background="@drawable/log_in_button"
+                            android:layout_gravity="center"
                             android:paddingStart="10dp"
                             android:paddingEnd="10dp"
                             android:text="자세히 보기"
-                            app:layout_constraintEnd_toStartOf="@+id/cafe_manage_modify_button"
-                            app:layout_constraintHorizontal_bias="0.5"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            android:background="#00ff0000" />
 
                         <Button
                             android:id="@+id/cafe_manage_modify_button"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/log_in_button"
+                            android:layout_gravity="center"
                             android:paddingStart="10dp"
                             android:paddingEnd="10dp"
                             android:text="@string/modify"
-                            app:layout_constraintEnd_toStartOf="@+id/cafe_manage_logout_button"
-                            app:layout_constraintHorizontal_bias="0.5"
-                            app:layout_constraintStart_toEndOf="@+id/cafe_manage_whole_detail_button"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            android:background="#00ff0000" />
+
+                        <Button
+                            android:id="@+id/cafe_manage_review_button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp"
+                            android:text="@string/review"
+                            android:background="#00ff0000" />
 
                         <Button
                             android:id="@+id/cafe_manage_logout_button"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/log_in_button"
+                            android:layout_gravity="center"
                             android:paddingStart="10dp"
                             android:paddingEnd="10dp"
                             android:text="로그아웃"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintHorizontal_bias="0.5"
-                            app:layout_constraintStart_toEndOf="@+id/cafe_manage_modify_button"
-                            app:layout_constraintTop_toTopOf="parent" />
-                    </androidx.constraintlayout.widget.ConstraintLayout>
+                            android:background="#00ff0000" />
+                    </TableRow>
+
+                    <!-- 카페 정보 수정 버튼 & 로그아웃 버튼 -->
+
                 </androidx.cardview.widget.CardView>
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>

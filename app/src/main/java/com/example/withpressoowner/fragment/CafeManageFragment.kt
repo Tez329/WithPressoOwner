@@ -279,6 +279,13 @@ class CafeManageFragment : Fragment() {
             pref.edit().clear().apply()
             findNavController().navigate(R.id.action_cafeManageFragment_to_logInFragment)
         }
+
+        cafe_manage_review_button.setOnClickListener {
+            val mean_rating = (cafeInfo.cafe_clean + cafeInfo.rest_clean + cafeInfo.noise + cafeInfo.study_well) / 4
+            val bundle = Bundle()
+            bundle.putFloat("mean_rating", mean_rating)
+            findNavController().navigate(R.id.action_cafeManageFragment_to_reviewFragment, bundle)
+        }
     }
 
     @SuppressLint("SetTextI18n")
