@@ -9,7 +9,12 @@ interface CafeInfoUpdateService {
     @FormUrlEncoded
     @POST("/owner/update_cafe_info/")
     suspend fun requestCafeInfoUpdate(
+        /* 카페 고유 번호 */
         @Field("cafe_asin") cafe_asin: Int,
+        /* 실시간 혼잡도 정보 */
+        @Field("change") change: Int,
+        @Field("complexity_level") level: Int,
+        @Field("num_of_customer") num_of_customer: Int,
         /* 카페 기본 정보 */
         @Field("cafe_name") cafe_name: String,
         @Field("cafe_addr") cafe_addr: String,

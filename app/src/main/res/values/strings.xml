@@ -64,6 +64,10 @@
     <string name="search">검색하기</string>
     <string name="add_photo">카페 사진 추가</string>
     <string name="menu_name">메뉴 이름</string>
-    <string name="send_check_msg">손님 인증 메시지 보내기</string>
+    <string name="send_check_msg">리뷰 코드 보내기</string>
     <string name="table_information">Table information</string>
+    <string name="use_coupon">쿠폰 사용하기</string>
+    <string name="enter_coupon_code">쿠폰 코드를 입력해주세요</string>
+    <string name="congestion_level">혼잡도 레벨:</string>
+    <string name="num_of_customer">매장 내 손님 수:</string>
 </resources>

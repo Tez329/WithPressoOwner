@@ -17,53 +17,44 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewParent
 import android.view.animation.AlphaAnimation
-import android.view.animation.TranslateAnimation
 import android.view.inputmethod.InputMethodManager
+import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.ListView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
-import androidx.coordinatorlayout.widget.ViewGroupUtils
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
-import androidx.core.util.toHalf
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.withpressoowner.R
 import com.example.withpressoowner.adapter.CafeImagePagerAdapter
 import com.example.withpressoowner.service.*
-import kotlinx.android.synthetic.main.cafe_whole_detail_info.*
-import kotlinx.android.synthetic.main.cafe_whole_detail_info.view.*
+import kotlinx.android.synthetic.main.cafe_whole_detail_info1.*
+import kotlinx.android.synthetic.main.cafe_whole_detail_info1.view.*
+import kotlinx.android.synthetic.main.cafe_whole_detail_info2.view.*
 import kotlinx.android.synthetic.main.fragment_cafe_manage.*
-import kotlinx.android.synthetic.main.fragment_detail_info_sec.*
-import kotlinx.android.synthetic.main.review_dialog_layout.*
 import kotlinx.android.synthetic.main.review_dialog_layout.view.*
+import kotlinx.android.synthetic.main.use_coupon_layout.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.error
 import org.jetbrains.anko.support.v4.alert
 import org.jetbrains.anko.support.v4.toast
-import org.jetbrains.anko.toast
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
-import java.io.IOException
-import java.net.HttpCookie.parse
-import java.util.logging.Level.parse
 import java.util.regex.Pattern
 
 class CafeManageFragment : Fragment() {
@@ -71,9 +62,13 @@ class CafeManageFragment : Fragment() {
     private lateinit var retrofit: Retrofit
     private lateinit var BASE_URL: String
     private lateinit var scope: CoroutineScope
+
     private lateinit var cafeInfo: CafeInfo
-    private lateinit var wholeDetailInfo: View
+    private lateinit var wholeDetailInfo1: View
+    private lateinit var wholeDetailInfo2: View
+
     private lateinit var reviewDialog: View
+    private lateinit var useCouponDialog: View
 
     private var MODIFY_MODE = false
     private val OPEN_GALLERY = 1001
@@ -105,58 +100,62 @@ class CafeManageFragment : Fragment() {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
         BASE_URL = "https://withpresso.gq"
-        reviewDialog = LayoutInflater.from(requireContext()).inflate(R.layout.review_dialog_layout, null)
         scope = CoroutineScope(Dispatchers.IO)
         info_cafe_photo_pager.orientation = ViewPager2.ORIENTATION_HORIZONTAL
 
-        wholeDetailInfo = LayoutInflater.from(requireContext()).inflate(R.layout.cafe_whole_detail_info, null)
+        reviewDialog = LayoutInflater.from(requireContext()).inflate(R.layout.review_dialog_layout, null)
+        useCouponDialog = LayoutInflater.from(requireContext()).inflate(R.layout.use_coupon_layout, null)
 
-        setLayoutOnClickListener(wholeDetailInfo.whole_detail_all_congestion_layout, wholeDetailInfo.whole_detail_congestion_layout, wholeDetailInfo.whole_detail_congestion_arrow_image)
-        setLayoutOnClickListener(wholeDetailInfo.whole_detail_all_table_layout, wholeDetailInfo.whole_detail_table_layout, wholeDetailInfo.whole_detail_table_arrow_image)
-        setLayoutOnClickListener(wholeDetailInfo.info_detail_all_chair_layout, wholeDetailInfo.whole_detail_chair_layout, wholeDetailInfo.whole_detail_chair_arrow_image)
-        setLayoutOnClickListener(wholeDetailInfo.info_detail_all_outlet_layout, wholeDetailInfo.whole_detail_num_outlet_layout, wholeDetailInfo.whole_detail_outlet_arrow_image)
-        setLayoutOnClickListener(wholeDetailInfo.info_detail_all_music_layout, wholeDetailInfo.whole_detail_music_layout, wholeDetailInfo.whole_detail_music_arrow_imgae)
-        setLayoutOnClickListener(wholeDetailInfo.info_detail_all_restroom_layout, wholeDetailInfo.whole_detail_rest_layout, wholeDetailInfo.whole_detail_rest_arrow_image)
-        setLayoutOnClickListener(wholeDetailInfo.info_detail_all_smoking_room_layout, wholeDetailInfo.whole_detail_smoking_room_layout, wholeDetailInfo.whole_detail_smoking_arrow_image)
-        setLayoutOnClickListener(wholeDetailInfo.info_detail_all_anti_corona_layout, wholeDetailInfo.whole_detail_anti_corona_layout, wholeDetailInfo.whole_detail_anti_arrow_image)
-        setLayoutOnClickListener(wholeDetailInfo.info_detail_all_discount_layout, wholeDetailInfo.whole_detail_discount_layout, wholeDetailInfo.whole_detail_discount_arrow_image)
-        setOnHideKeypadListener(wholeDetailInfo.whole_detail_congestion_edit)
-        setOnHideKeypadListener(wholeDetailInfo.whole_detail_seat1_edit)
-        setOnHideKeypadListener(wholeDetailInfo.whole_detail_seat2_edit)
-        setOnHideKeypadListener(wholeDetailInfo.whole_detail_seat4_edit)
-        setOnHideKeypadListener(wholeDetailInfo.whole_detail_multi_seat_edit)
-        setOnHideKeypadListener(wholeDetailInfo.whole_detail_table_size_edit)
-        setOnHideKeypadListener(wholeDetailInfo.whole_detail_chair_cushion_edit)
-        setOnHideKeypadListener(wholeDetailInfo.whole_detail_num_outlet_edit)
-        setOnHideKeypadListener(wholeDetailInfo.whole_detail_genre_edit)
-        setOnHideKeypadListener(wholeDetailInfo.whole_detail_anti_corona_edit)
-        setOnHideKeypadListener(wholeDetailInfo.whole_detail_discount_edit)
-        wholeDetailInfo.whole_detail_chair_back_group.setOnCheckedChangeListener { group, checkedId ->
+        wholeDetailInfo1 = LayoutInflater.from(requireContext()).inflate(R.layout.cafe_whole_detail_info1, null)
+        wholeDetailInfo2 = LayoutInflater.from(requireContext()).inflate(R.layout.cafe_whole_detail_info2, null)
+
+        setLayoutOnClickListener(wholeDetailInfo1.whole_detail_all_congestion_layout, wholeDetailInfo1.whole_detail_congestion_layout, wholeDetailInfo1.whole_detail_congestion_arrow_image)
+        setLayoutOnClickListener(wholeDetailInfo1.whole_detail_all_table_layout, wholeDetailInfo1.whole_detail_table_layout, wholeDetailInfo1.whole_detail_table_arrow_image)
+        setLayoutOnClickListener(wholeDetailInfo1.info_detail_all_chair_layout, wholeDetailInfo1.whole_detail_chair_layout, wholeDetailInfo1.whole_detail_chair_arrow_image)
+        setLayoutOnClickListener(wholeDetailInfo1.info_detail_all_outlet_layout, wholeDetailInfo1.whole_detail_num_outlet_layout, wholeDetailInfo1.whole_detail_outlet_arrow_image)
+        setLayoutOnClickListener(wholeDetailInfo1.info_detail_all_music_layout, wholeDetailInfo1.whole_detail_music_layout, wholeDetailInfo1.whole_detail_music_arrow_image)
+        setLayoutOnClickListener(wholeDetailInfo1.info_detail_all_restroom_layout, wholeDetailInfo1.whole_detail_rest_layout, wholeDetailInfo1.whole_detail_rest_arrow_image)
+        setLayoutOnClickListener(wholeDetailInfo2.info_detail_all_smoking_room_layout, wholeDetailInfo2.whole_detail_smoking_room_layout, wholeDetailInfo2.whole_detail_smoking_arrow_image)
+        setLayoutOnClickListener(wholeDetailInfo2.info_detail_all_anti_corona_layout, wholeDetailInfo2.whole_detail_anti_corona_layout, wholeDetailInfo2.whole_detail_anti_arrow_image)
+        setLayoutOnClickListener(wholeDetailInfo2.info_detail_all_discount_layout, wholeDetailInfo2.whole_detail_discount_layout, wholeDetailInfo2.whole_detail_discount_arrow_image)
+        setOnHideKeypadListener(wholeDetailInfo1.whole_detail_congestion_level_edit)
+        setOnHideKeypadListener(wholeDetailInfo1.whole_detail_num_of_customer_edit)
+        setOnHideKeypadListener(wholeDetailInfo1.whole_detail_seat1_edit)
+        setOnHideKeypadListener(wholeDetailInfo1.whole_detail_seat2_edit)
+        setOnHideKeypadListener(wholeDetailInfo1.whole_detail_seat4_edit)
+        setOnHideKeypadListener(wholeDetailInfo1.whole_detail_multi_seat_edit)
+        setOnHideKeypadListener(wholeDetailInfo1.whole_detail_table_size_edit)
+        setOnHideKeypadListener(wholeDetailInfo1.whole_detail_chair_cushion_edit)
+        setOnHideKeypadListener(wholeDetailInfo1.whole_detail_num_outlet_edit)
+        setOnHideKeypadListener(wholeDetailInfo1.whole_detail_genre_edit)
+        setOnHideKeypadListener(wholeDetailInfo2.whole_detail_anti_corona_edit)
+        setOnHideKeypadListener(wholeDetailInfo2.whole_detail_discount_edit)
+        wholeDetailInfo1.whole_detail_chair_back_group.setOnCheckedChangeListener { group, checkedId ->
             when(checkedId) {
                 R.id.whole_detail_chair_back_yes_radio -> chair_back = 1
                 R.id.whole_detail_chair_back_no_radio -> chair_back = 0
             }
         }
-        wholeDetailInfo.whole_detail_rest_loc_group.setOnCheckedChangeListener { group, checkedId ->
+        wholeDetailInfo1.whole_detail_rest_loc_group.setOnCheckedChangeListener { group, checkedId ->
             when(checkedId) {
                 R.id.whole_detail_rest_in_radio -> rest_in = 1
                 R.id.whole_detail_rest_out_radio -> rest_in = 0
             }
         }
-        wholeDetailInfo.whole_detail_rest_gen_sep_group.setOnCheckedChangeListener { group, checkedId ->
+        wholeDetailInfo1.whole_detail_rest_gen_sep_group.setOnCheckedChangeListener { group, checkedId ->
             when(checkedId) {
                 R.id.whole_detail_gen_sep_yes_radio -> rest_gen_sep = 1
                 R.id.whole_detail_gen_sep_no_radio -> rest_gen_sep = 0
             }
         }
-        wholeDetailInfo.whole_detail_smoking_room_group.setOnCheckedChangeListener { group, checkedId ->
+        wholeDetailInfo2.whole_detail_smoking_room_group.setOnCheckedChangeListener { group, checkedId ->
             when(checkedId) {
                 R.id.detail_info2_smoking_room_in_radio -> smoking_in = 1
                 R.id.detail_info2_smoking_room_out_radio -> smoking_in = 0
             }
         }
 
-        cafe_manage_review_button.setOnClickListener {
+        cafe_manage_auth_code_button.setOnClickListener {
             reviewDialog.parent?.let { (reviewDialog.parent as ViewGroup).removeView(reviewDialog) }
             AlertDialog.Builder(requireContext())
                 .setView(reviewDialog)
@@ -168,7 +167,9 @@ class CafeManageFragment : Fragment() {
                     else {
                         val phoneNum = reviewDialog.phone_number_edit.text.toString()
                         val sendAuthCodeService = retrofit.create(SendAuthCodeService::class.java)
-                        sendAuthCodeService.requestSendMsg(phoneNum).enqueue(object :Callback<Int>{
+                        sendAuthCodeService.requestSendMsg(
+                            pref.getInt("cafe_asin", 0), phoneNum
+                        ).enqueue(object :Callback<Int>{
                             override fun onFailure(call: Call<Int>, t: Throwable) {
                                 Log.e("send msg request", "failed")
                                 alert("인증 코드 발송을 실패했습니다.")
@@ -188,15 +189,80 @@ class CafeManageFragment : Fragment() {
                 }
                 .show()
         }
+        cafe_manage_use_coupon_button.setOnClickListener {
+            useCouponDialog.parent?.let { (useCouponDialog.parent as ViewGroup).removeView(useCouponDialog) }
+            AlertDialog.Builder(requireContext())
+                .setView(useCouponDialog)
+                .setNegativeButton("취소하기") { dialogInterface: DialogInterface, i: Int -> }
+                .setPositiveButton("사용하기") { dialogInterface: DialogInterface, i: Int ->
+                    /* 코드 없이 '사용하기' 버튼 클릭 */
+                    if (useCouponDialog.coupon_code.text.toString().isEmpty())
+                        toast("쿠폰 코드를 입력해주세요")
+                    /* 코드 입력 후 '사용하기' 버튼 클릭 */
+                    else {
+                        val coupon_code = useCouponDialog.coupon_code.text.toString()
+                        val useCouponService = retrofit.create(UseCouponService::class.java)
+                        useCouponService.requestDeleteCoupon(
+                            pref.getInt("cafe_asin", 0),
+                            coupon_code
+                        ).enqueue(object :Callback<Int> {
+                            override fun onFailure(call: Call<Int>, t: Throwable) {
+                                Log.e("use coupon request", "failed")
+                            }
 
+                            override fun onResponse(call: Call<Int>, response: Response<Int>) {
+                                val result = response.body()
+                                result?.let {
+                                    if (result == 1)
+                                        toast("쿠폰이 사용되었습니다")
+                                    else
+                                        toast("사용할 수 없는 쿠폰입니다")
+                                }
+                            }
+                        })
+                    }
+                }
+                .show()
+        }
         /* 세부 정보 자세히 보기 */
         cafe_manage_refresh.setOnRefreshListener {
             onResume()
             cafe_manage_refresh.isRefreshing = false
         }
         cafe_manage_whole_detail_button.setOnClickListener {
+            val moreDetailInfo = LayoutInflater.from(requireContext()).inflate(R.layout.cafe_detail_info, null)
+
+            moreDetailInfo.info_detail_all_congestion_text.text =
+                "혼잡도 레벨: ${cafeInfo.level}\n" +
+                        "매장 내 손님 수: ${cafeInfo.num_of_customer}"
+            moreDetailInfo.info_detail_all_table_text.text =
+                "1인석/2인석/4인석/다인석: ${cafeInfo.table_struct}\n" +
+                        "넓이(2인석 기준): " + "A4 ${cafeInfo.table_size}장"
+            moreDetailInfo.info_detail_all_chair_text.text =
+                "쿠션감: ${cafeInfo.chair_cushion}\n" +
+                        "등받이: ${textConverter("chair_back", cafeInfo.chair_back)}"
+            moreDetailInfo.info_detail_all_outlet_text.text =
+                "개수: ${cafeInfo.num_plug}"
+            moreDetailInfo.info_detail_all_music_text.text =
+                "장르: ${cafeInfo.music_genre}"
+            moreDetailInfo.info_detail_all_restroom_text.text =
+                "위치: ${textConverter("rest_in", cafeInfo.rest_in)}\n" +
+                        "성별 분리: ${textConverter("rest_gen_sep", cafeInfo.rest_gen_sep)}"
+            moreDetailInfo.info_detail_all_smoking_room_text.text =
+                "유무: ${textConverter("smoking_room", cafeInfo.smoking_room)}"
+            moreDetailInfo.info_detail_all_anti_corona_text.text =
+                "최근 방역 날짜: ${cafeInfo.anco_data}"
+            moreDetailInfo.info_detail_all_cafe_clean_text.text =
+                "매장 청결: ${cafeInfo.cafe_clean}점\n" +
+                        "화장실 청결: ${cafeInfo.rest_clean}점"
+            moreDetailInfo.info_detail_all_noise_text.text =
+                "주변 소리(1점 = 시끄러움 ~ 5점 = 조용): ${cafeInfo.noise}점"
+            moreDetailInfo.info_detail_all_study_well_text.text =
+                "공부 잘 됨 지수: ${cafeInfo.study_well}점"
+
             AlertDialog.Builder(requireContext())
-                .setView(wholeDetailInfo)
+                .setView(moreDetailInfo)
+                .setNegativeButton("뒤로가기") { dialogInterface: DialogInterface, i: Int -> }
                 .show()
         }
 
@@ -287,26 +353,27 @@ class CafeManageFragment : Fragment() {
 
     @SuppressLint("SetTextI18n")
     private fun initWholeDetailInfo() {
-        wholeDetailInfo.info_detail_all_congestion_text.text =
-            "혼잡도: 받아와서 보여주기"
-        wholeDetailInfo.info_detail_all_table_text.text =
+        wholeDetailInfo1.info_detail_all_congestion_text.text =
+            "혼잡도 레벨: ${cafeInfo.level}\n" +
+                    "매장 내 손님 수: ${cafeInfo.num_of_customer}"
+        wholeDetailInfo1.info_detail_all_table_text.text =
             "1인석/2인석/4인석/다인석: ${cafeInfo.table_struct}\n" +
                     "넓이(2인석 기준): " + "A4 ${cafeInfo.table_size}장"
-        wholeDetailInfo.info_detail_all_chair_text.text =
+        wholeDetailInfo1.info_detail_all_chair_text.text =
             "쿠션감: ${cafeInfo.chair_cushion}\n" +
                     "등받이: ${textConverter("chair_back", cafeInfo.chair_back)}"
-        wholeDetailInfo.info_detail_all_outlet_text.text =
+        wholeDetailInfo1.info_detail_all_outlet_text.text =
             "개수: ${cafeInfo.num_plug}"
-        wholeDetailInfo.info_detail_all_music_text.text =
+        wholeDetailInfo1.info_detail_all_music_text.text =
             "장르: ${cafeInfo.music_genre}"
-        wholeDetailInfo.info_detail_all_restroom_text.text =
+        wholeDetailInfo1.info_detail_all_restroom_text.text =
             "위치: ${textConverter("rest_in", cafeInfo.rest_in)}\n" +
                     "성별 분리: ${textConverter("rest_gen_sep", cafeInfo.rest_gen_sep)}"
-        wholeDetailInfo.info_detail_all_smoking_room_text.text =
+        wholeDetailInfo2.info_detail_all_smoking_room_text.text =
             "흡연실: ${textConverter("smoking_room", cafeInfo.smoking_room)}"
-        wholeDetailInfo.info_detail_all_anti_corona_text.text =
+        wholeDetailInfo2.info_detail_all_anti_corona_text.text =
             "최근 방역 날짜: ${cafeInfo.anco_data}"
-        wholeDetailInfo.info_detail_all_discount_text.text =
+        wholeDetailInfo2.info_detail_all_discount_text.text =
             "재주문 시 할인율: ${cafeInfo.discount}%"
 
         cafeInfo.cafe_clean = Math.round((cafeInfo.cafe_clean * 10)) / 10f
@@ -314,76 +381,76 @@ class CafeManageFragment : Fragment() {
         cafeInfo.noise = Math.round((cafeInfo.noise * 10)) / 10f
         cafeInfo.study_well = Math.round((cafeInfo.study_well * 10)) / 10f
 
-        wholeDetailInfo.info_detail_all_cafe_clean_text.text =
+        wholeDetailInfo2.info_detail_all_cafe_clean_text.text =
             "매장 청결: ${cafeInfo.cafe_clean}점\n" +
                     "화장실 청결: ${cafeInfo.rest_clean}점"
-        wholeDetailInfo.info_detail_all_noise_text.text =
+        wholeDetailInfo2.info_detail_all_noise_text.text =
             "주변 소리(1점 = 시끄러움 ~ 5점 = 조용): ${cafeInfo.noise}점"
-        wholeDetailInfo.info_detail_all_study_well_text.text =
+        wholeDetailInfo2.info_detail_all_study_well_text.text =
             "공부 잘 됨 지수: ${cafeInfo.study_well}점"
 
         val seat = cafeInfo.table_struct.split("/")
         /* table */
-        wholeDetailInfo.whole_detail_seat1_edit.hint = seat[0]
-        wholeDetailInfo.whole_detail_seat2_edit.hint = seat[1]
-        wholeDetailInfo.whole_detail_seat4_edit.hint = seat[2]
-        wholeDetailInfo.whole_detail_multi_seat_edit.hint = seat[3]
-        wholeDetailInfo.whole_detail_table_size_edit.hint = cafeInfo.table_size.toString()
+        wholeDetailInfo1.whole_detail_seat1_edit.hint = seat[0]
+        wholeDetailInfo1.whole_detail_seat2_edit.hint = seat[1]
+        wholeDetailInfo1.whole_detail_seat4_edit.hint = seat[2]
+        wholeDetailInfo1.whole_detail_multi_seat_edit.hint = seat[3]
+        wholeDetailInfo1.whole_detail_table_size_edit.hint = cafeInfo.table_size.toString()
         /* chair */
-        wholeDetailInfo.whole_detail_chair_cushion_edit.hint = cafeInfo.chair_cushion
+        wholeDetailInfo1.whole_detail_chair_cushion_edit.hint = cafeInfo.chair_cushion
         if (cafeInfo.chair_back == 1) {
-            wholeDetailInfo.whole_detail_chair_back_yes_radio.isChecked = true
-            wholeDetailInfo.whole_detail_chair_back_no_radio.isChecked = false
+            wholeDetailInfo1.whole_detail_chair_back_yes_radio.isChecked = true
+            wholeDetailInfo1.whole_detail_chair_back_no_radio.isChecked = false
         }
         else {
-            wholeDetailInfo.whole_detail_chair_back_yes_radio.isChecked = false
-            wholeDetailInfo.whole_detail_chair_back_no_radio.isChecked = true
+            wholeDetailInfo1.whole_detail_chair_back_yes_radio.isChecked = false
+            wholeDetailInfo1.whole_detail_chair_back_no_radio.isChecked = true
         }
         /* outlet */
-        wholeDetailInfo.whole_detail_num_outlet_edit.hint = cafeInfo.num_plug.toString()
+        wholeDetailInfo1.whole_detail_num_outlet_edit.hint = cafeInfo.num_plug.toString()
         /* music */
-        wholeDetailInfo.whole_detail_genre_edit.hint = cafeInfo.music_genre
+        wholeDetailInfo1.whole_detail_genre_edit.hint = cafeInfo.music_genre
         /* restroom */
         if (cafeInfo.rest_gen_sep == 1) {
-            wholeDetailInfo.whole_detail_gen_sep_yes_radio.isChecked = true
-            wholeDetailInfo.whole_detail_gen_sep_no_radio.isChecked = false
+            wholeDetailInfo1.whole_detail_gen_sep_yes_radio.isChecked = true
+            wholeDetailInfo1.whole_detail_gen_sep_no_radio.isChecked = false
         }
         else {
-            wholeDetailInfo.whole_detail_gen_sep_yes_radio.isChecked = false
-            wholeDetailInfo.whole_detail_gen_sep_no_radio.isChecked = true
+            wholeDetailInfo1.whole_detail_gen_sep_yes_radio.isChecked = false
+            wholeDetailInfo1.whole_detail_gen_sep_no_radio.isChecked = true
         }
         if (cafeInfo.rest_in == 1) {
-            wholeDetailInfo.whole_detail_rest_in_radio.isChecked = true
-            wholeDetailInfo.whole_detail_rest_out_radio.isChecked = false
+            wholeDetailInfo1.whole_detail_rest_in_radio.isChecked = true
+            wholeDetailInfo1.whole_detail_rest_out_radio.isChecked = false
         }
         else {
-            wholeDetailInfo.whole_detail_rest_in_radio.isChecked = false
-            wholeDetailInfo.whole_detail_rest_out_radio.isChecked = true
+            wholeDetailInfo2.whole_detail_rest_in_radio.isChecked = false
+            wholeDetailInfo2.whole_detail_rest_out_radio.isChecked = true
         }
         /* smoking room */
         if (cafeInfo.smoking_room == 1) {
-            wholeDetailInfo.whole_detail_smoking_room_in_radio.isChecked = true
-            wholeDetailInfo.whole_detail_smoking_room_out_radio.isChecked = false
+            wholeDetailInfo2.whole_detail_smoking_room_in_radio.isChecked = true
+            wholeDetailInfo2.whole_detail_smoking_room_out_radio.isChecked = false
         }
         else {
-            wholeDetailInfo.whole_detail_smoking_room_in_radio.isChecked = false
-            wholeDetailInfo.whole_detail_smoking_room_out_radio.isChecked = true
+            wholeDetailInfo2.whole_detail_smoking_room_in_radio.isChecked = false
+            wholeDetailInfo2.whole_detail_smoking_room_out_radio.isChecked = true
         }
         /* anti-corona */
-        wholeDetailInfo.whole_detail_anti_corona_edit.hint = cafeInfo.anco_data
+        wholeDetailInfo2.whole_detail_anti_corona_edit.hint = cafeInfo.anco_data
         /* discount */
-        wholeDetailInfo.whole_detail_discount_edit.hint = cafeInfo.discount.toString()
+        wholeDetailInfo2.whole_detail_discount_edit.hint = cafeInfo.discount.toString()
     }
 
-    private fun setLayoutOnClickListener(parentLayout: LinearLayout, childLayout: LinearLayout, arrow: ImageView) {
+    private fun setLayoutOnClickListener(parentLayout: View, childLayout: View, arrow: ImageView) {
         parentLayout.setOnClickListener {
             val currDegree = arrow.rotation
             if (childLayout.visibility == View.GONE) {
                 /* 변경 항목 보여주기 */
+//                val animator = AlphaAnimation(0f, 1f)
+//                animator.duration = 300
+//                childLayout.animation = animator
                 childLayout.visibility = View.VISIBLE
-                val animator = AlphaAnimation(0f, 1f)
-                animator.duration = 100
-                childLayout.animation = animator
                 /* 버튼 회전 */
                 ObjectAnimator.ofFloat(arrow, View.ROTATION, currDegree, currDegree + 90f)
                     .setDuration(300)
@@ -391,15 +458,27 @@ class CafeManageFragment : Fragment() {
             }
             else {
                 /* 변경 항목 보여주기 */
-                val animator = AlphaAnimation(1f, 0f)
-                animator.duration = 100
-                childLayout.animation = animator
+//                val animator = AlphaAnimation(1f, 0f)
+//                animator.duration = 300
+//                childLayout.animation = animator
                 childLayout.visibility = View.GONE
                 /* 버튼 회전 */
                 ObjectAnimator.ofFloat(arrow, View.ROTATION, currDegree, currDegree - 90f)
                     .setDuration(300)
                     .start()
             }
+        }
+    }
+
+    private fun closeChildLayout (childLayout: View, arrow: ImageView) {
+        if (childLayout.visibility == View.VISIBLE) {
+            val currDegree = arrow.rotation
+            /* 변경 항목 보여주기 */
+            childLayout.visibility = View.GONE
+            /* 버튼 회전 */
+            ObjectAnimator.ofFloat(arrow, View.ROTATION, currDegree, currDegree - 90f)
+                .setDuration(300)
+                .start()
         }
     }
 
@@ -569,29 +648,39 @@ class CafeManageFragment : Fragment() {
 
         scope.launch(Dispatchers.Main) {
             this.launch {
-                wholeDetailInfo.parent?.let {
-                    (wholeDetailInfo.parent as ViewGroup).removeView(wholeDetailInfo)
+                wholeDetailInfo1.parent?.let {
+                    (wholeDetailInfo1.parent as ViewGroup).removeView(wholeDetailInfo1)
                 }
-                cafe_manage_detail_info_layout.addView(wholeDetailInfo, 1)
+                cafe_manage_detail_info_layout.addView(wholeDetailInfo1, 1)
+                wholeDetailInfo2.parent?.let {
+                    (wholeDetailInfo2.parent as ViewGroup).removeView(wholeDetailInfo2)
+                }
+                cafe_manage_detail_info_layout.addView(wholeDetailInfo2, 2)
             }.join()
 
             this.launch {
+
                 /* 사진 추가하기 버튼 X */
                 cafe_manage_select_photo_button.visibility = View.VISIBLE
                 /* 세부 정보 버튼&정보 X*/
-                cafe_manage_review_button.visibility = View.GONE
+                cafe_manage_use_coupon_button.visibility = View.GONE
+                cafe_manage_auth_code_button.visibility = View.GONE
                 cafe_manage_whole_detail_button.visibility = View.GONE
                 cafe_manage_detail_info_list.visibility = View.GONE
                 /* 화살표 O */
-                whole_detail_congestion_arrow_image.visibility = View.VISIBLE
-                whole_detail_table_arrow_image.visibility = View.VISIBLE
-                whole_detail_chair_arrow_image.visibility = View.VISIBLE
-                whole_detail_outlet_arrow_image.visibility = View.VISIBLE
-                whole_detail_music_arrow_imgae.visibility = View.VISIBLE
-                whole_detail_rest_arrow_image.visibility = View.VISIBLE
-                whole_detail_smoking_arrow_image.visibility = View.VISIBLE
-                whole_detail_anti_arrow_image.visibility = View.VISIBLE
-                whole_detail_discount_arrow_image.visibility = View.VISIBLE
+                wholeDetailInfo1.let {
+                    it.whole_detail_congestion_arrow_image.visibility = View.VISIBLE
+                    it.whole_detail_table_arrow_image.visibility = View.VISIBLE
+                    it.whole_detail_chair_arrow_image.visibility = View.VISIBLE
+                    it.whole_detail_outlet_arrow_image.visibility = View.VISIBLE
+                    it.whole_detail_music_arrow_image.visibility = View.VISIBLE
+                    it.whole_detail_rest_arrow_image.visibility = View.VISIBLE
+                }
+                wholeDetailInfo2.let {
+                    it.whole_detail_smoking_arrow_image.visibility = View.VISIBLE
+                    it.whole_detail_anti_arrow_image.visibility = View.VISIBLE
+                    it.whole_detail_discount_arrow_image.visibility = View.VISIBLE
+                }
 
                 cafe_manage_modify_button.text = getString(R.string.change_reflect)
             }
@@ -609,37 +698,61 @@ class CafeManageFragment : Fragment() {
         MODIFY_MODE = false
 
         scope.launch(Dispatchers.Main) {
+            /* 변경 사항 데이터 세팅 */
+            var change = 0
             this.launch(Dispatchers.Default) {
                 cafeInfo.let {
                     /* 카페 세부 정보 */
+                    /* 0. 좌석 혼잡도 */
+                    wholeDetailInfo1.whole_detail_congestion_level_edit.text.toString().toIntOrNull()?.let {
+                        cafeInfo.level = it
+                        change = 1
+                    }
+                    wholeDetailInfo1.whole_detail_num_of_customer_edit.text.toString().toIntOrNull()?.let {
+                        cafeInfo.num_of_customer = it
+                        change = 1
+                    }
                     /* 1.책상 */
                     val table_info_array = it.table_struct.split("/") as ArrayList
-                    if (whole_detail_seat1_edit.text.isNotEmpty())
-                        table_info_array[0] = whole_detail_seat1_edit.text.toString()
-                    if (whole_detail_seat2_edit.text.isNotEmpty())
-                        table_info_array[1] = whole_detail_seat2_edit.text.toString()
-                    if (whole_detail_seat4_edit.text.isNotEmpty())
-                        table_info_array[2] = whole_detail_seat4_edit.text.toString()
-                    if (whole_detail_multi_seat_edit.text.isNotEmpty())
-                        table_info_array[3] = whole_detail_multi_seat_edit.text.toString()
+                    wholeDetailInfo1.whole_detail_seat1_edit.text.toString().toIntOrNull()?.let {
+                        table_info_array[0] = it.toString()
+                    }
+                    wholeDetailInfo1.whole_detail_seat2_edit.text.toString().toIntOrNull()?.let {
+                        table_info_array[1] = it.toString()
+                    }
+                    wholeDetailInfo1.whole_detail_seat4_edit.text.toString().toIntOrNull()?.let {
+                        table_info_array[2] = it.toString()
+                    }
+                    wholeDetailInfo1.whole_detail_multi_seat_edit.text.toString().toIntOrNull()?.let {
+                        table_info_array[3] = it.toString()
+                    }
                     it.table_struct = "${table_info_array[0]}/${table_info_array[1]}/${table_info_array[2]}/${table_info_array[3]}"
-                    it.table_size = whole_detail_table_size_edit.text.toString().toIntOrNull() ?: it.table_size
+                    wholeDetailInfo1.whole_detail_table_size_edit.text.toString().toIntOrNull()?.let {
+                        cafeInfo.table_size = it
+                    }
                     /* 2.의자 */
-                    it.chair_back = chair_back ?: it.chair_back
-                    whole_detail_chair_cushion_edit.text?.let { cafeInfo.chair_cushion = it.toString() }
+                    chair_back?.let { cafeInfo.chair_back }
+                    if (!wholeDetailInfo1.whole_detail_chair_cushion_edit.text.isNullOrBlank())
+                        cafeInfo.chair_cushion = wholeDetailInfo1.whole_detail_chair_cushion_edit.text.toString()
                     /* 3.플러그 */
-                    it.num_plug = whole_detail_num_outlet_edit.text.toString().toIntOrNull() ?: it.num_plug
+                    wholeDetailInfo1.whole_detail_num_outlet_edit.text.toString().toIntOrNull()?.let {
+                        cafeInfo.num_plug = it
+                    }
                     /* 4.음악 */
-                    whole_detail_genre_edit.text?.let { cafeInfo.music_genre = it.toString() }
+                    if (!wholeDetailInfo1.whole_detail_genre_edit.text.toString().isBlank())
+                        cafeInfo.music_genre = wholeDetailInfo1.whole_detail_genre_edit.text.toString()
                     /* 5.화장실 정보 */
-                    it.rest_in = rest_in ?: it.rest_in
-                    it.rest_gen_sep = rest_gen_sep ?: it.rest_gen_sep
+                    rest_in?.let { cafeInfo.rest_in = it }
+                    rest_gen_sep?.let { cafeInfo.rest_gen_sep = it }
                     /* 6.방역 날짜 */
-                    whole_detail_anti_corona_edit.text?.let { cafeInfo.anco_data = it.toString() }
+                    if (!wholeDetailInfo2.whole_detail_anti_corona_edit.text.toString().isBlank())
+                        cafeInfo.anco_data = wholeDetailInfo2.whole_detail_anti_corona_edit.text.toString()
                     /* 7.흡연실 유무 */
-                    it.smoking_room = smoking_in ?: it.smoking_room
+                    smoking_in?.let { cafeInfo.smoking_room = it }
                     /* 11.할인율 */
-                    it.discount = whole_detail_discount_edit.text.toString().toIntOrNull() ?: it.discount
+                    wholeDetailInfo2.whole_detail_discount_edit.text.toString().toIntOrNull()?.let {
+                        cafeInfo.discount = it
+                    }
                 }
             }.join()
 
@@ -647,7 +760,7 @@ class CafeManageFragment : Fragment() {
                 cafeInfo.let {
                     val cafeInfoUpdateService = retrofit.create(CafeInfoUpdateService::class.java)
                     val result = cafeInfoUpdateService.requestCafeInfoUpdate(
-                        pref.getInt("cafe_asin", 0),
+                        pref.getInt("cafe_asin", 0), change, it.level, it.num_of_customer,
                         it.cafe_name, it.cafe_addr, it.cafe_hour, it.cafe_tel, it.cafe_menu,
                         it.table_struct, it.table_size, it.chair_back, it.chair_cushion,
                         it.num_plug, it.music_genre, it.rest_in, it.rest_gen_sep,
@@ -655,7 +768,14 @@ class CafeManageFragment : Fragment() {
                     )
                     if (result == 1) {
                         scope.launch(Dispatchers.Main) {
-                            wholeDetailInfo.let {
+                            wholeDetailInfo1.let {
+                                /* 화살표 제자리로 돌려놓기 */
+                                closeChildLayout(it.whole_detail_congestion_layout, it.whole_detail_congestion_arrow_image)
+                                closeChildLayout(it.whole_detail_table_layout, it.whole_detail_table_arrow_image)
+                                closeChildLayout(it.whole_detail_chair_layout, it.whole_detail_chair_arrow_image)
+                                closeChildLayout(it.whole_detail_num_outlet_layout, it.whole_detail_outlet_arrow_image)
+                                closeChildLayout(it.whole_detail_music_layout, it.whole_detail_music_arrow_image)
+                                closeChildLayout(it.whole_detail_rest_layout, it.whole_detail_rest_arrow_image)
                                 /* 세부 정보 레이아웃 X */
                                 it.whole_detail_congestion_layout.visibility = View.GONE
                                 it.whole_detail_table_layout.visibility = View.GONE
@@ -663,16 +783,23 @@ class CafeManageFragment : Fragment() {
                                 it.whole_detail_num_outlet_layout.visibility = View.GONE
                                 it.whole_detail_music_layout.visibility = View.GONE
                                 it.whole_detail_rest_layout.visibility = View.GONE
-                                it.whole_detail_smoking_room_layout.visibility = View.GONE
-                                it.whole_detail_anti_corona_layout.visibility = View.GONE
-                                it.whole_detail_discount_layout.visibility = View.GONE
                                 /* 화살표 X */
                                 it.whole_detail_congestion_arrow_image.visibility = View.GONE
                                 it.whole_detail_table_arrow_image.visibility = View.GONE
                                 it.whole_detail_chair_arrow_image.visibility = View.GONE
                                 it.whole_detail_outlet_arrow_image.visibility = View.GONE
-                                it.whole_detail_music_arrow_imgae.visibility = View.GONE
+                                it.whole_detail_music_arrow_image.visibility = View.GONE
                                 it.whole_detail_rest_arrow_image.visibility = View.GONE
+                            }
+                            wholeDetailInfo2.let {
+                                closeChildLayout(it.whole_detail_smoking_room_layout, it.whole_detail_smoking_arrow_image)
+                                closeChildLayout(it.whole_detail_anti_corona_layout, it.whole_detail_anti_arrow_image)
+                                closeChildLayout(it.whole_detail_discount_layout, it.whole_detail_discount_arrow_image)
+                                /* 세부 정보 레이아웃 X */
+                                it.whole_detail_smoking_room_layout.visibility = View.GONE
+                                it.whole_detail_anti_corona_layout.visibility = View.GONE
+                                it.whole_detail_discount_layout.visibility = View.GONE
+                                /* 화살표 X */
                                 it.whole_detail_smoking_arrow_image.visibility = View.GONE
                                 it.whole_detail_anti_arrow_image.visibility = View.GONE
                                 it.whole_detail_discount_arrow_image.visibility = View.GONE
@@ -680,17 +807,20 @@ class CafeManageFragment : Fragment() {
                             /* 사진 추가하기 버튼 X */
                             cafe_manage_select_photo_button.visibility = View.GONE
                             /* 세부 정보 & 수정 버튼 O*/
-                            cafe_manage_review_button.visibility = View.VISIBLE
+                            cafe_manage_use_coupon_button.visibility = View.VISIBLE
+                            cafe_manage_auth_code_button.visibility = View.VISIBLE
                             cafe_manage_whole_detail_button.visibility = View.VISIBLE
                             cafe_manage_detail_info_list.visibility = View.VISIBLE
                             /* 버튼 글씨 바꾸기 */
                             cafe_manage_modify_button.text = getString(R.string.modify)
 
-                            wholeDetailInfo.parent?.let {
-                                (wholeDetailInfo.parent as ViewGroup).removeView(wholeDetailInfo)
+                            wholeDetailInfo1.parent?.let {
+                                (wholeDetailInfo1.parent as ViewGroup).removeView(wholeDetailInfo1)
+                            }
+                            wholeDetailInfo2.parent?.let {
+                                (wholeDetailInfo2.parent as ViewGroup).removeView(wholeDetailInfo2)
                             }
                         }.join()
-
                         onResume()
                     }
                     else
