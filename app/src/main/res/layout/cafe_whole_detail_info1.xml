@@ -65,15 +65,36 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <EditText
-            android:id="@+id/whole_detail_congestion_level_edit"
+        <RadioGroup
+            android:id="@+id/whole_detail_congestion_group"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:ems="3"
-            android:inputType="number"
+            android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="@+id/whole_detail_congestion_text"
             app:layout_constraintStart_toEndOf="@+id/whole_detail_congestion_text"
-            app:layout_constraintTop_toTopOf="@+id/whole_detail_congestion_text" />
+            app:layout_constraintTop_toTopOf="@+id/whole_detail_congestion_text">
+
+            <RadioButton
+                android:id="@+id/whole_detail_plenty_radio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@string/plenty"/>
+
+            <RadioButton
+                android:id="@+id/whole_detail_normal_radio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@string/normal"/>
+
+            <RadioButton
+                android:id="@+id/whole_detail_congestion_radio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@string/congestion"/>
+        </RadioGroup>
 
         <TextView
             android:id="@+id/whole_detail_num_of_customer_text"

@@ -68,7 +68,7 @@
     <string name="table_information">Table information</string>
     <string name="use_coupon">쿠폰 사용하기</string>
     <string name="enter_coupon_code">쿠폰 코드를 입력해주세요</string>
-    <string name="congestion_level">혼잡도 레벨:</string>
+    <string name="congestion_level">혼잡도:</string>
     <string name="num_of_customer">매장 내 손님 수:</string>
     <string name="review_comment">리뷰 내용</string>
     <string name="review_point">리뷰 점수:</string>
@@ -76,4 +76,7 @@
     <string name="customer_review">손님 리뷰</string>
     <string name="nickname">닉네임</string>
     <string name="review">리뷰 보기</string>
+    <string name="plenty">여유</string>
+    <string name="normal">보통</string>
+    <string name="congestion">혼잡</string>
 </resources>

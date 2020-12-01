@@ -20,10 +20,7 @@ import android.view.ViewGroup
 import android.view.ViewParent
 import android.view.animation.AlphaAnimation
 import android.view.inputmethod.InputMethodManager
-import android.widget.ArrayAdapter
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.ListView
+import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
@@ -57,6 +54,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
 import java.util.regex.Pattern
 
+@Suppress("IMPLICIT_CAST_TO_ANY")
 class CafeManageFragment : Fragment() {
     private lateinit var pref: SharedPreferences
     private lateinit var retrofit: Retrofit
@@ -76,6 +74,7 @@ class CafeManageFragment : Fragment() {
 
     private var photoList: MutableList<String>? = null
 
+    private var congestion_level: Int? = null
     private var chair_back: Int? = null
     private var rest_in: Int? = null
     private var rest_gen_sep: Int? = null
@@ -118,7 +117,6 @@ class CafeManageFragment : Fragment() {
         setLayoutOnClickListener(wholeDetailInfo2.info_detail_all_smoking_room_layout, wholeDetailInfo2.whole_detail_smoking_room_layout, wholeDetailInfo2.whole_detail_smoking_arrow_image)
         setLayoutOnClickListener(wholeDetailInfo2.info_detail_all_anti_corona_layout, wholeDetailInfo2.whole_detail_anti_corona_layout, wholeDetailInfo2.whole_detail_anti_arrow_image)
         setLayoutOnClickListener(wholeDetailInfo2.info_detail_all_discount_layout, wholeDetailInfo2.whole_detail_discount_layout, wholeDetailInfo2.whole_detail_discount_arrow_image)
-        setOnHideKeypadListener(wholeDetailInfo1.whole_detail_congestion_level_edit)
         setOnHideKeypadListener(wholeDetailInfo1.whole_detail_num_of_customer_edit)
         setOnHideKeypadListener(wholeDetailInfo1.whole_detail_seat1_edit)
         setOnHideKeypadListener(wholeDetailInfo1.whole_detail_seat2_edit)
@@ -130,6 +128,13 @@ class CafeManageFragment : Fragment() {
         setOnHideKeypadListener(wholeDetailInfo1.whole_detail_genre_edit)
         setOnHideKeypadListener(wholeDetailInfo2.whole_detail_anti_corona_edit)
         setOnHideKeypadListener(wholeDetailInfo2.whole_detail_discount_edit)
+        wholeDetailInfo1.whole_detail_congestion_group.setOnCheckedChangeListener { group, checkedId ->
+            when(checkedId) {
+                R.id.whole_detail_plenty_radio -> congestion_level = 1
+                R.id.whole_detail_normal_radio -> congestion_level = 2
+                R.id.whole_detail_congestion_radio -> congestion_level = 3
+            }
+        }
         wholeDetailInfo1.whole_detail_chair_back_group.setOnCheckedChangeListener { group, checkedId ->
             when(checkedId) {
                 R.id.whole_detail_chair_back_yes_radio -> chair_back = 1
@@ -171,17 +176,22 @@ class CafeManageFragment : Fragment() {
                             pref.getInt("cafe_asin", 0), phoneNum
                         ).enqueue(object :Callback<Int>{
                             override fun onFailure(call: Call<Int>, t: Throwable) {
-                                Log.e("send msg request", "failed")
+                                Log.e("send msg request", t.message!!)
                                 alert("인증 코드 발송을 실패했습니다.")
                             }
 
+                            @SuppressLint("ShowToast")
                             override fun onResponse(call: Call<Int>, response: Response<Int>) {
                                 val result = response.body()
                                 result?.let {
-                                    if (result == 1)
-                                        toast("인증 코드를 발송했습니다!")
-                                    else
-                                        toast("인증 코드 발송을 실패했습니다.")
+                                    if (result == 1) {
+                                        toast("인증 코드를 발송했습니다")
+                                        Log.d("send auth code", "success")
+                                    }
+                                    else{
+                                        toast("인증 코드 발송을 실패했습니다")
+                                        Log.d("send auth code", "failed")
+                                    }
                                 }
                             }
                         })
@@ -200,23 +210,28 @@ class CafeManageFragment : Fragment() {
                         toast("쿠폰 코드를 입력해주세요")
                     /* 코드 입력 후 '사용하기' 버튼 클릭 */
                     else {
-                        val coupon_code = useCouponDialog.coupon_code.text.toString()
+                        val couponCode = useCouponDialog.coupon_code.text.toString()
                         val useCouponService = retrofit.create(UseCouponService::class.java)
                         useCouponService.requestDeleteCoupon(
                             pref.getInt("cafe_asin", 0),
-                            coupon_code
+                            couponCode
                         ).enqueue(object :Callback<Int> {
                             override fun onFailure(call: Call<Int>, t: Throwable) {
-                                Log.e("use coupon request", "failed")
+                                Log.e("use coupon req failed", t.message!!)
                             }
 
+                            @SuppressLint("ShowToast")
                             override fun onResponse(call: Call<Int>, response: Response<Int>) {
                                 val result = response.body()
                                 result?.let {
-                                    if (result == 1)
-                                        toast("쿠폰이 사용되었습니다")
-                                    else
+                                    if (result == 1) {
+                                        toast("쿠폰을 사용했습니다")
+                                        Log.d("use coupon", "success")
+                                    }
+                                    else{
                                         toast("사용할 수 없는 쿠폰입니다")
+                                        Log.d("use coupon", "failed")
+                                    }
                                 }
                             }
                         })
@@ -224,16 +239,18 @@ class CafeManageFragment : Fragment() {
                 }
                 .show()
         }
+
         /* 세부 정보 자세히 보기 */
         cafe_manage_refresh.setOnRefreshListener {
             onResume()
             cafe_manage_refresh.isRefreshing = false
         }
+
         cafe_manage_whole_detail_button.setOnClickListener {
             val moreDetailInfo = LayoutInflater.from(requireContext()).inflate(R.layout.cafe_detail_info, null)
 
             moreDetailInfo.info_detail_all_congestion_text.text =
-                "혼잡도 레벨: ${cafeInfo.level}\n" +
+                "혼잡도: ${textConverter("level", cafeInfo.level)}\n" +
                         "매장 내 손님 수: ${cafeInfo.num_of_customer}"
             moreDetailInfo.info_detail_all_table_text.text =
                 "1인석/2인석/4인석/다인석: ${cafeInfo.table_struct}\n" +
@@ -262,7 +279,7 @@ class CafeManageFragment : Fragment() {
 
             AlertDialog.Builder(requireContext())
                 .setView(moreDetailInfo)
-                .setNegativeButton("뒤로가기") { dialogInterface: DialogInterface, i: Int -> }
+                .setNegativeButton("뒤로가기") { _: DialogInterface, _: Int -> }
                 .show()
         }
 
@@ -310,6 +327,8 @@ class CafeManageFragment : Fragment() {
                 cafe_manage_cafe_menu_text.text = "메뉴: ${cafeInfo.cafe_menu}"
 
                 /* 세부 정보 */
+                cafe_manage_congestion_text.text =
+                    "혼잡도: ${textConverter("level", cafeInfo.level)}"
                 cafe_manage_table_text.text =
                     "1인석/2인석/4인석/다인석: ${cafeInfo.table_struct}\n" +
                             "넓이(2인석 기준): " + "A4 ${cafeInfo.table_size}장"
@@ -318,8 +337,6 @@ class CafeManageFragment : Fragment() {
                             "등받이: ${textConverter("chair_back", cafeInfo.chair_back)}"
                 cafe_manage_plug_text.text =
                     "개수: ${cafeInfo.num_plug}"
-                cafe_manage_congestion_text.text =
-                    "혼잡도: 받아와서 보여주기"
 
                 initWholeDetailInfo()
             }
@@ -344,6 +361,12 @@ class CafeManageFragment : Fragment() {
                 if(value == 1) "있어요."
                 else "없어요."
             }
+            "level" -> {
+                if (value == 1) "여유 있어요"
+                else if (value == 2) "보통이에요"
+                else if (value == 3) "혼잡해요"
+                else    "영업 시간이 아니에요"
+            }
             else -> null
         }
     }
@@ -361,7 +384,7 @@ class CafeManageFragment : Fragment() {
     @SuppressLint("SetTextI18n")
     private fun initWholeDetailInfo() {
         wholeDetailInfo1.info_detail_all_congestion_text.text =
-            "혼잡도 레벨: ${cafeInfo.level}\n" +
+            "혼잡도: ${textConverter("level", cafeInfo.level)}\n" +
                     "매장 내 손님 수: ${cafeInfo.num_of_customer}"
         wholeDetailInfo1.info_detail_all_table_text.text =
             "1인석/2인석/4인석/다인석: ${cafeInfo.table_struct}\n" +
@@ -397,6 +420,23 @@ class CafeManageFragment : Fragment() {
             "공부 잘 됨 지수: ${cafeInfo.study_well}점"
 
         val seat = cafeInfo.table_struct.split("/")
+        /* congestion */
+        wholeDetailInfo1.whole_detail_num_of_customer_edit.hint = cafeInfo.num_of_customer.toString()
+        if (cafeInfo.level == 1) {
+            wholeDetailInfo1.whole_detail_plenty_radio.isChecked = true
+            wholeDetailInfo1.whole_detail_normal_radio.isChecked = false
+            wholeDetailInfo1.whole_detail_congestion_radio.isChecked = false
+        }
+        else if (cafeInfo.level == 2){
+            wholeDetailInfo1.whole_detail_plenty_radio.isChecked = false
+            wholeDetailInfo1.whole_detail_normal_radio.isChecked = true
+            wholeDetailInfo1.whole_detail_congestion_radio.isChecked = false
+        }
+        else {
+            wholeDetailInfo1.whole_detail_plenty_radio.isChecked = false
+            wholeDetailInfo1.whole_detail_normal_radio.isChecked = false
+            wholeDetailInfo1.whole_detail_congestion_radio.isChecked = true
+        }
         /* table */
         wholeDetailInfo1.whole_detail_seat1_edit.hint = seat[0]
         wholeDetailInfo1.whole_detail_seat2_edit.hint = seat[1]
@@ -454,9 +494,6 @@ class CafeManageFragment : Fragment() {
             val currDegree = arrow.rotation
             if (childLayout.visibility == View.GONE) {
                 /* 변경 항목 보여주기 */
-//                val animator = AlphaAnimation(0f, 1f)
-//                animator.duration = 300
-//                childLayout.animation = animator
                 childLayout.visibility = View.VISIBLE
                 /* 버튼 회전 */
                 ObjectAnimator.ofFloat(arrow, View.ROTATION, currDegree, currDegree + 90f)
@@ -465,9 +502,6 @@ class CafeManageFragment : Fragment() {
             }
             else {
                 /* 변경 항목 보여주기 */
-//                val animator = AlphaAnimation(1f, 0f)
-//                animator.duration = 300
-//                childLayout.animation = animator
                 childLayout.visibility = View.GONE
                 /* 버튼 회전 */
                 ObjectAnimator.ofFloat(arrow, View.ROTATION, currDegree, currDegree - 90f)
@@ -670,6 +704,8 @@ class CafeManageFragment : Fragment() {
                 /* 사진 추가하기 버튼 X */
                 cafe_manage_select_photo_button.visibility = View.VISIBLE
                 /* 세부 정보 버튼&정보 X*/
+                cafe_manage_review_button.visibility = View.GONE
+                cafe_manage_logout_button.visibility = View.GONE
                 cafe_manage_use_coupon_button.visibility = View.GONE
                 cafe_manage_auth_code_button.visibility = View.GONE
                 cafe_manage_whole_detail_button.visibility = View.GONE
@@ -711,10 +747,7 @@ class CafeManageFragment : Fragment() {
                 cafeInfo.let {
                     /* 카페 세부 정보 */
                     /* 0. 좌석 혼잡도 */
-                    wholeDetailInfo1.whole_detail_congestion_level_edit.text.toString().toIntOrNull()?.let {
-                        cafeInfo.level = it
-                        change = 1
-                    }
+                    congestion_level?.let { cafeInfo.level = it }
                     wholeDetailInfo1.whole_detail_num_of_customer_edit.text.toString().toIntOrNull()?.let {
                         cafeInfo.num_of_customer = it
                         change = 1
@@ -814,6 +847,8 @@ class CafeManageFragment : Fragment() {
                             /* 사진 추가하기 버튼 X */
                             cafe_manage_select_photo_button.visibility = View.GONE
                             /* 세부 정보 & 수정 버튼 O*/
+                            cafe_manage_review_button.visibility = View.VISIBLE
+                            cafe_manage_logout_button.visibility = View.VISIBLE
                             cafe_manage_use_coupon_button.visibility = View.VISIBLE
                             cafe_manage_auth_code_button.visibility = View.VISIBLE
                             cafe_manage_whole_detail_button.visibility = View.VISIBLE
