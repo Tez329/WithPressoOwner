@@ -328,7 +328,8 @@ class CafeManageFragment : Fragment() {
 
                 /* 세부 정보 */
                 cafe_manage_congestion_text.text =
-                    "혼잡도: ${textConverter("level", cafeInfo.level)}"
+                    "혼잡도: ${textConverter("level", cafeInfo.level)}\n" +
+                            "매장 내 손님 수: ${cafeInfo.num_of_customer}"
                 cafe_manage_table_text.text =
                     "1인석/2인석/4인석/다인석: ${cafeInfo.table_struct}\n" +
                             "넓이(2인석 기준): " + "A4 ${cafeInfo.table_size}장"
